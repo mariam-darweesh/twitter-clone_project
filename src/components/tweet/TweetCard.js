@@ -1,9 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
+"use client";
 import Link from "next/link";
+import { useState } from "react";
 import { Heart, MessageCircle, Repeat2, Share } from "lucide-react";
+import CommentSection from "@/components/comment/CommentSection";
 
-export default function TweetCard({ tweet, onLike }) {
+export default function TweetCard({ tweet, onLike, onComment }) {
 
+  const [showComments, setShowComments] = useState(false);
   const author = tweet.author || {
       name: "Unknown User",
       username: "unknown",
@@ -33,11 +37,18 @@ export default function TweetCard({ tweet, onLike }) {
             </p>
           </Link>
           <div className="mt-4 flex max-w-md justify-between text-gray-500">
-            <button className="flex items-center gap-2 hover:text-sky-500">
+            <button
+              onClick={() => setShowComments((prev) => !prev)} 
+              className="flex items-center gap-2 hover:text-sky-500">
               <MessageCircle size={18} />
-              {tweet.comments}
+              {tweet.commentsCount || 0}
             </button>
-
+            {showComments && (
+              <CommentSection
+                tweetId={tweet._id}
+                onCommentAdded={onComment}
+              />
+            )}
             <button className="hover:text-green-500">
               <Repeat2 size={18} />
             </button>

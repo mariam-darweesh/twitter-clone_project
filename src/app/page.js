@@ -99,6 +99,36 @@ export default function Home() {
     }
   }
 
+  // async function handleCommentTweet(id, content){
+  //   if(!content.trim()) return;
+
+  //   const res = await fetch(`/api/tweets/${id}/comments`, {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({ content }),
+  //   });
+
+  //   if(!res.ok) return;
+
+  //   setTweets((prevTweets) =>
+  //     prevTweets.map((tweet) =>
+  //       tweet._id === id ? { ...tweet, commentsCount: tweet.commentsCount + 1 } : tweet
+  //     )
+  //   );
+  // }
+
+  function handleCommentTweet(tweetId) {
+    setTweets((prevTweets) =>
+      prevTweets.map((tweet) =>
+        tweet._id === tweetId
+          ? { ...tweet, commentsCount: (tweet.commentsCount || 0) + 1 }
+          : tweet
+      )
+    );
+  }
+  
   if (status === "loading") {
     return (
       <main className="flex min-h-screen items-center justify-center bg-black text-white">
@@ -127,11 +157,11 @@ export default function Home() {
           <TweetComposer onAddTweet={handleAddTweet} />
         </div>
 
-  {error && (
-    <div className="border-b border-[#2f3336] bg-red-950/40 px-4 py-3 text-sm text-red-300">
-      {error}
-    </div>
-  )}
+        {error && (
+          <div className="border-b border-[#2f3336] bg-red-950/40 px-4 py-3 text-sm text-red-300">
+            {error}
+          </div>
+        )}
           {/* The loading state will show a skeleton loader, while the empty state will show a welcome message. */}
           {loading ? (
             <div className="space-y-4 p-4">
@@ -158,7 +188,11 @@ export default function Home() {
               </p>
             </div>
           ) : (
-            <TweetFeed tweets={tweets} onLike={handleLikeTweet} />
+            <TweetFeed 
+              tweets={tweets} 
+              onLike={handleLikeTweet} 
+              onComment={handleCommentTweet} 
+            />
           )}
         </section>
 
