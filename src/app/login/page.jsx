@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
+import Link from 'next/link';
 import TwitterLogo from '@/components/ui/TwitterLogo';
 
 export default function LoginPage() {
@@ -98,6 +99,12 @@ export default function LoginPage() {
                         {loading ? "Signing in..." : "Sign in"}
                     </button>
                 </div>
+                <p className="mt-6 text-center text-sm text-gray-500">
+                    Don&apos;t have an account?{" "}
+                    <Link href="/register" className="text-sky-400 hover:underline">
+                        Create account
+                    </Link>
+                </p>
             </form>
         </main>
     )

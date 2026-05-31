@@ -2,8 +2,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Trash2 } from "lucide-react";
 
-export default function CommentSection({ tweetId, onCommentAdded }) {
+export default function CommentSection({ tweetId, onCommentAdded, onCommentDeleted }) {
     const [comments, setComments] = useState([]);
     const [content, setContent] = useState("");
     const [loading, setLoading] = useState(true);
@@ -52,6 +53,25 @@ export default function CommentSection({ tweetId, onCommentAdded }) {
         }
     }
 
+    //adding delete functionality for comments
+    async function handleDeleteComment(commentId) {
+        try {
+            const res = await fetch(`/api/comments/${commentId}`, {
+                method: "DELETE",
+            });
+
+            if (!res.ok) {
+                throw new Error("Failed to delete comment");
+            }
+
+            setComments(prev => prev.filter(comment => comment._id !== commentId));
+            // Notify parent to update comment count
+            onCommentDeleted(tweetId, "delete");
+        } catch (error) {
+            console.error("Error deleting comment:", error);
+        }
+    }
+
     return (
     <div className="mt-4 border-t border-[#2f3336] pt-4">
       <form onSubmit={handleSubmit} className="flex gap-2">
@@ -78,15 +98,15 @@ export default function CommentSection({ tweetId, onCommentAdded }) {
           <p className="text-sm text-gray-500">No replies yet.</p>
         ) : (
           comments.map((comment) => (
-            <div key={comment._id} className="flex gap-3">
+            <div key={comment._id} className="flex gap-6 flex-row items-start relative">
               <img
                 src={comment.user?.avatar || "/default-avatar.png"}
                 alt={comment.user?.name || "User"}
                 className="h-8 w-8 rounded-full object-cover"
               />
 
-              <div>
-                <div className="flex gap-2 text-sm">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 text-sm">
                   <p className="font-bold text-white">
                     {comment.user?.name}
                   </p>
@@ -97,6 +117,13 @@ export default function CommentSection({ tweetId, onCommentAdded }) {
 
                 <p className="text-sm text-gray-200">{comment.content}</p>
               </div>
+
+              <button
+                onClick={() => handleDeleteComment(comment._id)}
+                className="text-gray-500 transition hover:text-red-500"
+              >
+                <Trash2 size={16} />
+              </button>
             </div>
           ))
         )}

@@ -3,7 +3,9 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+
+import TweetFeed from "@/components/tweet/TweetFeed";
 import Sidebar from "@/components/layout/Sidebar";
 import Rightbar from "@/components/layout/Rightbar";
 import MobileNav from "@/components/layout/MobileNav";
@@ -11,12 +13,35 @@ import MobileNav from "@/components/layout/MobileNav";
 export default function ProfilePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [tweets, setTweets] = useState([]);
+  const [loadingTweets, setLoadingTweets] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
     }
   }, [status, router]);
+
+  useEffect(() => {
+    if(!session?.user?.id) return;
+
+    async function getUserTweets(){
+      try {
+        setLoadingTweets(true);
+
+        const res = await fetch(`/api/tweets/user/${session.user.id}`);
+        const data = await res.json();
+
+        setTweets(data);
+      } catch (error) {
+        console.error("Failed to fetch user tweets", error);
+      } finally {
+        setLoadingTweets(false);
+      }
+    }
+    getUserTweets();
+  },[session?.user?.id]);
+
 
   if (status === "loading") {
     return (
@@ -65,6 +90,19 @@ export default function ProfilePage() {
                 <p>
                   <span className="font-bold text-white">0</span> Followers
                 </p>
+              </div>
+              <div className="border-t border-[#2f3336]">
+              <div className="border-b border-[#2f3336] px-4 py-3">
+                <h2 className="font-bold">Tweets</h2>
+              </div>
+
+                {loadingTweets ? (
+                  <p className="p-4 text-gray-500">Loading tweets...</p>
+                ) : tweets.length === 0 ? (
+                  <p className="p-4 text-gray-500">No tweets yet.</p>
+                ) : (
+                  <TweetFeed tweets={tweets} />
+                )}
               </div>
             </div>
           </div>

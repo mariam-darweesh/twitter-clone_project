@@ -3,9 +3,11 @@ import User from "@/models/User";
 
 export async function GET(req, { params}) {
     try {
-        await connnectDB();
+        await connectDB();
         const { username } = await params;
+        console.log("Fetching user with username:", username);
         const user = await User.findOne({ username });
+        console.log("Found user:", user);
 
         if(!user){
             return Response.json(

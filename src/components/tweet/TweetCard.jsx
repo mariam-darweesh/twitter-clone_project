@@ -1,18 +1,27 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { useState } from "react";
-import { Heart, MessageCircle, Repeat2, Share } from "lucide-react";
+import { Heart, MessageCircle, Repeat2, Share, Trash2 } from "lucide-react";
 import CommentSection from "@/components/comment/CommentSection";
 
-export default function TweetCard({ tweet, onLike, onComment }) {
+export default function TweetCard({ tweet, onLike, onComment, onDelete }) {
 
+  const { data: session } = useSession();
   const [showComments, setShowComments] = useState(false);
+
+
+  const authorId =
+    typeof tweet.author === "object" ? tweet.author._id : tweet.author;
+
+  const isOwner = session?.user?.id === authorId?.toString();
   const author = tweet.author || {
       name: "Unknown User",
       username: "unknown",
       avatar: "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y",
     };
+
   return (
     <article className="border-b border-[#2f3336] px-4 py-3 transition hover:bg-white/[0.03]" >
       <div className="flex gap-3">
@@ -43,12 +52,7 @@ export default function TweetCard({ tweet, onLike, onComment }) {
               <MessageCircle size={18} />
               {tweet.commentsCount || 0}
             </button>
-            {showComments && (
-              <CommentSection
-                tweetId={tweet._id}
-                onCommentAdded={onComment}
-              />
-            )}
+            
             <button className="hover:text-green-500">
               <Repeat2 size={18} />
             </button>
@@ -64,7 +68,23 @@ export default function TweetCard({ tweet, onLike, onComment }) {
             <button className="hover:text-sky-500">
               <Share size={18} />
             </button>
+
+              {isOwner && (
+                <button
+                  onClick={() => onDelete(tweet._id)}
+                  className="transition hover:text-red-500"
+                >
+                  <Trash2 size={18} />
+                </button>
+              )}
           </div>
+            {showComments && (
+              <CommentSection
+                tweetId={tweet._id}
+                onCommentAdded={onComment}
+                onCommentDeleted={(tweetId) => onComment(tweetId, "delete")}
+              />
+            )}
         </div>
       </div>
     </article>

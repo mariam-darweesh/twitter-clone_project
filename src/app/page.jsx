@@ -51,7 +51,7 @@ export default function Home() {
 
     getTweets();
   }, [status, router]);
-
+// add new tweet
   async function handleAddTweet(content) {
     if (!content.trim()) return;
 
@@ -75,7 +75,7 @@ export default function Home() {
       setError("Could not post tweet. Please try again.");
     }
   }
-
+// add like
   async function handleLikeTweet(id) {
     try {
       const res = await fetch(`/api/tweets/${id}/like`, {
@@ -98,36 +98,40 @@ export default function Home() {
       setError("Could not update like. Please try again.");
     }
   }
-
-  // async function handleCommentTweet(id, content){
-  //   if(!content.trim()) return;
-
-  //   const res = await fetch(`/api/tweets/${id}/comments`, {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({ content }),
-  //   });
-
-  //   if(!res.ok) return;
-
-  //   setTweets((prevTweets) =>
-  //     prevTweets.map((tweet) =>
-  //       tweet._id === id ? { ...tweet, commentsCount: tweet.commentsCount + 1 } : tweet
-  //     )
-  //   );
-  // }
-
-  function handleCommentTweet(tweetId) {
+// add new comment to certin tweet
+  function handleCommentTweet(tweetId, type="add") {
     setTweets((prevTweets) =>
       prevTweets.map((tweet) =>
         tweet._id === tweetId
-          ? { ...tweet, commentsCount: (tweet.commentsCount || 0) + 1 }
+          ? { ...tweet, commentsCount: (tweet.commentsCount || 0) + (type === "add" ? 1 : -1) }
           : tweet
       )
     );
   }
+
+// delete specific tweet
+  async function handleDeleteTweet(tweetId) {
+      const confirmed = window.confirm(
+        "Are you sure you want to delete this tweet?"
+      );
+
+      if(!confirmed) return;
+
+
+      try { const res = await fetch(`/api/tweets/${tweetId}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to delete tweet");
+      }
+
+      setTweets((prevTweets) => prevTweets.filter((tweet) => tweet._id !== tweetId));
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   
   if (status === "loading") {
     return (
@@ -191,7 +195,8 @@ export default function Home() {
             <TweetFeed 
               tweets={tweets} 
               onLike={handleLikeTweet} 
-              onComment={handleCommentTweet} 
+              onComment={handleCommentTweet}
+              onDelete={handleDeleteTweet} 
             />
           )}
         </section>
