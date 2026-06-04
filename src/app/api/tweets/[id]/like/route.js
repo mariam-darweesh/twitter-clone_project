@@ -1,28 +1,58 @@
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+
 import { connectDB } from "@/lib/mongodb";
 import Tweet from "@/models/Tweet";
+import { authOptions } from "@/auth";
 
 export async function PATCH(req, { params }) {
   try {
     await connectDB();
-    // Extract the tweet ID from the request parameters
+    
     const { id } = await params;
-   // Use the ID to find the tweet and increment its likes by 1
-    const tweet = await Tweet.findByIdAndUpdate(
-      id,
-      { $inc: { likes: 1 } },
-      { new: true }
-    );
+    const session = await getServerSession(authOptions);
 
-    if (!tweet) {
-      return Response.json({ message: "Tweet not found" }, { status: 404 });
+    if(!session?.user?.id){
+      return NextResponse.json(
+        { message: "unauthenticated" },
+        { status: 401 }
+      );
     }
 
-    return Response.json(tweet);
+    const tweet = await Tweet.findById(id);
+    
+    if (!tweet) {
+      return NextResponse.json(
+        { message: "Tweet not found" }, 
+        { status: 404 }
+      );
+    }
+
+    const userId = session.user.id;
+
+    const alreadyLiked = tweet.likes.some(
+      (likedId) => likedId.toString() === userId
+    );
+
+    if(alreadyLiked){
+      tweet.likes = tweet.likes.filter(
+        (likedId) => likedId.toString() !== userId
+      );
+    } else {
+      tweet.likes.push(userId);
+    }
+
+    await tweet.save();
+
+    const updatedTweet = await Tweet.findById(id)
+      .populate("author", "name username avatar");
+
+    return NextResponse.json(updatedTweet);
   } catch (error) {
-    return Response.json(
-      { message: "Failed to like tweet", error: error.message },
+    console.error("LIKE API ERROR:", error);
+    return NextResponse.json(
+      { message: "Failed to update like", error: error.message },
       { status: 500 }
     );
   }
 }
-

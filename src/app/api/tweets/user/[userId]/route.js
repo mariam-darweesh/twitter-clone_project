@@ -9,6 +9,7 @@ export async function GET(req, { params }){
         console.log("Fetching tweets for user ID:", userId);
         const tweets = await Tweet
             .find({ author: userId })
+            .populate("author", "name username avatar")
             .sort({ createdAt: -1 });
         console.log(`Found ${tweets.length} tweets for user ID ${userId}`);
             return NextResponse.json(tweets);

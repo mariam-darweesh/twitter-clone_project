@@ -42,6 +42,48 @@ export default function ProfilePage() {
     getUserTweets();
   },[session?.user?.id]);
 
+  async function handleLikeTweet(id) {
+    try {
+      const res = await fetch(`/api/tweets/${id}/like`, {
+          method: "PATCH",
+        });
+
+        if(!res.ok) {
+          throw new Error("Failed to like tweet");
+        }
+
+        const updatedTweet = await res.json();
+
+        setTweets((prevTweets) => 
+          prevTweets.map((tweet) => 
+            tweet._id === updatedTweet._id ? updatedTweet : tweet
+      ));
+    } catch(error) {
+      console.error("Failed to like tweet:", error);
+    }
+  }
+
+  async function handleDeleteTweet(tweetId) {
+      const confirmed = window.confirm(
+        "Are you sure you want to delete this tweet?"
+      );
+
+      if(!confirmed) return;
+
+
+      try { const res = await fetch(`/api/tweets/${tweetId}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to delete tweet");
+      }
+
+      setTweets((prevTweets) => prevTweets.filter((tweet) => tweet._id !== tweetId));
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   if (status === "loading") {
     return (
@@ -101,7 +143,7 @@ export default function ProfilePage() {
                 ) : tweets.length === 0 ? (
                   <p className="p-4 text-gray-500">No tweets yet.</p>
                 ) : (
-                  <TweetFeed tweets={tweets} />
+                  <TweetFeed tweets={tweets} onLike={handleLikeTweet} onDelete={handleDeleteTweet} />
                 )}
               </div>
             </div>

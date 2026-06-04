@@ -13,10 +13,12 @@ const tweetSchema = new mongoose.Schema(
         trim: true,
         maxlength: 280
     },
-    likes: {
-        type: Number,
-        default: 0
-    },
+    likes: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
     replies: {
         type: Number,
         default: 0

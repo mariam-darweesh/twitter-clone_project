@@ -11,6 +11,9 @@ export default function TweetCard({ tweet, onLike, onComment, onDelete }) {
   const { data: session } = useSession();
   const [showComments, setShowComments] = useState(false);
 
+  console.log("TWEET:", tweet);
+  console.log("LIKES:", tweet.likes);
+  console.log("LIKES TYPE:", typeof tweet.likes);
 
   const authorId =
     typeof tweet.author === "object" ? tweet.author._id : tweet.author;
@@ -21,6 +24,14 @@ export default function TweetCard({ tweet, onLike, onComment, onDelete }) {
       username: "unknown",
       avatar: "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y",
     };
+
+  const likesArray = Array.isArray(tweet.likes) ? tweet.likes : [];
+
+  const likesCount = likesArray.length;
+
+  const isLiked = likesArray.some(
+    (likeId) => likeId.toString() === session?.user?.id
+  );
 
   return (
     <article className="border-b border-[#2f3336] px-4 py-3 transition hover:bg-white/[0.03]" >
@@ -58,11 +69,12 @@ export default function TweetCard({ tweet, onLike, onComment, onDelete }) {
             </button>
 
             <button
-              onClick={() => onLike(tweet._id)}
-              className="flex items-center gap-2 hover:text-pink-500"
+              onClick={() => onLike?.(tweet._id)}
+              className={`flex items-center gap-2 transition
+              ${ isLiked ? "text-pink-500" : "text-gray-500 hover:text-pink-500"}`}
             >
-              <Heart size={18} />
-              {tweet.likes}
+              <Heart size={18} fill={isLiked ? "currentColor" : "none"} />
+              {likesCount}
             </button>
 
             <button className="hover:text-sky-500">

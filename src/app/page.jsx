@@ -81,13 +81,13 @@ export default function Home() {
       const res = await fetch(`/api/tweets/${id}/like`, {
         method: "PATCH",
       });
-
-      if (!res.ok) {
-        throw new Error("Failed to like tweet");
-      }
-
       const updatedTweet = await res.json();
 
+      if (!res.ok) {
+        throw new Error(updatedTweet.message || "Failed to like tweet");
+      }
+
+      console.log("UPDATED TWEET:", updatedTweet);
       setTweets((prevTweets) =>
         prevTweets.map((tweet) =>
           tweet._id === updatedTweet._id ? updatedTweet : tweet
