@@ -37,7 +37,7 @@ export default function TweetCard({ tweet, onLike, onComment, onDelete }) {
     <article className="border-b border-[#2f3336] px-4 py-3 transition hover:bg-white/[0.03]" >
       <div className="flex gap-3">
         <img
-          src={author.avatar}
+          src={`${author.avatar}?u=${authorId}`}
           alt={author.username}
           width={44}
           height={44}

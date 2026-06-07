@@ -2,10 +2,12 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { Image, Smile } from "lucide-react";
 
 export default function TweetFeed({ onAddTweet }) {
   const [content, setContent] = useState("");
+  const { data: session } = useSession();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -21,7 +23,7 @@ export default function TweetFeed({ onAddTweet }) {
     <form onSubmit={handleSubmit} className="border-b border-[#2f3336] px-4 py-3 transition hover:bg-white/[0.03]">
       <div className="flex gap-3">
         <img
-          src="https://i.pravatar.cc/100?img=12"
+          src={`${session.user.avatar}?u=${session.user.id}`}
           alt="Ahmed"
           className="h-11 w-11 rounded-full"
         />
