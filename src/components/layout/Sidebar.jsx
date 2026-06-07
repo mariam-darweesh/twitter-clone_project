@@ -10,9 +10,8 @@ import {
   Bell,
   Mail,
   User,
-  Feather,
   Bookmark,
-  BookHeart,
+  Rows3,
   CircleEllipsis,
 } from "lucide-react";
 import TwitterLogo from "../ui/TwitterLogo";
@@ -26,15 +25,15 @@ export default function Sidebar() {
     { label: "Notifications", icon: Bell, href: "/notifications" },
     { label: "Messages", icon: Mail, href: "/messages" },
     { label: "Bookmarks", icon: Bookmark, href: "/bookmarks" },
-    { label: "Likes", icon: BookHeart, href: "/likes" },
-    { label: "More", icon: CircleEllipsis, href: "/more" },
+    { label: "Lists", icon: Rows3, href: "/lists" },
     { 
       label: "Profile", 
       icon: User, 
       href: session?.user?.username
-        ? `/profile/${session.user.username}`
-        : "/login",
+      ? `/profile/${session.user.username}`
+      : "/login",
     },
+    { label: "More", icon: CircleEllipsis, href: "/more" },
 ];
   const pathname = usePathname();
 
@@ -69,7 +68,7 @@ export default function Sidebar() {
         </nav>
 
         <button className="mt-6 flex w-full items-center justify-center rounded-full bg-sky-500 py-3 text-lg font-bold text-white transition hover:bg-sky-600">
-          <Feather size={20} className="mr-2" />
+          {/* <Feather size={20} className="mr-2" /> */}
           Tweet
         </button>
 
@@ -78,7 +77,8 @@ export default function Sidebar() {
             <div className="flex items-center justify-between rounded-full p-3 transition hover:bg-gray-900">
               <div className="flex min-w-0 items-center gap-3">
                 <img
-                  src={session.user.avatar || "/default-avatar.png"}
+                  // src={session.user.avatar || "/default-avatar.png"}
+                  src={`${session.user.avatar}?u=${session.user.id}`|| "/default-avatar.png"}
                   alt={session.user.name || "User avatar"}
                   className="h-10 w-10 rounded-full object-cover"
                 />
