@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
@@ -5,7 +6,7 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { Image, Smile } from "lucide-react";
 
-export default function TweetFeed({ onAddTweet }) {
+export default function TweetComposer({ onAddTweet }) {
   const [content, setContent] = useState("");
   const { data: session } = useSession();
 
@@ -24,7 +25,7 @@ export default function TweetFeed({ onAddTweet }) {
       <div className="flex gap-3">
         <img
           src={`${session.user.avatar}?u=${session.user.id}`}
-          alt="Ahmed"
+          alt={session.user.name}
           className="h-11 w-11 rounded-full"
         />
 

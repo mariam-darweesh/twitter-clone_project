@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
-import { Heart, MessageCircle, Repeat2, Share, Trash2 } from "lucide-react";
+import { Heart, MessageCircle, Repeat2, Share, Bookmark, Trash2 } from "lucide-react";
 import CommentSection from "@/components/comment/CommentSection";
 
 export default function TweetCard({ tweet, onLike, onComment, onDelete }) {
@@ -79,6 +79,10 @@ export default function TweetCard({ tweet, onLike, onComment, onDelete }) {
 
             <button className="hover:text-sky-500">
               <Share size={18} />
+            </button>
+
+            <button className="hover:text-sky-500">
+              <Bookmark size={18} />
             </button>
 
               {isOwner && (
